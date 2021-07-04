@@ -2,7 +2,6 @@ import jester, strutils, sequtils, asyncdispatch, times, templates, json, algori
 import styles, script
 
 
-
 type todoItem = object
     id: int
     text: string
@@ -20,15 +19,15 @@ proc addTodo(id: int, desc: string, date: DateTime): todoItem =
 
 
 proc loadTodosFromFile =
-    let fileData = readFile("todos.txt")
-    let contentSeq = fileData.splitLines()
+    let 
+        fileData = readFile("todos.txt")
+        contentSeq = fileData.splitLines()
     # echo contentSeq
     for line in contentSeq:
         # echo line
         if line == "": continue
-        var todoData = line.strip().split()
-        # echo todoData
-        var
+        var 
+            todoData = line.strip().split()
             descLen = len(todoData)
             desc = ""
         for i in 1..descLen-3:
@@ -93,30 +92,31 @@ proc renderPage(stylesheet, script: string): string = tmpli html"""
         </body>
         </html>
     """
+# =====================
 
 loadTodosFromFile()
-saveTodosToFile()
-
-# echo todoSeq
-
-# echo typeof(times.now().format("MM-dd hh:mm"))
+# saveTodosToFile()
 
 # Routes
 routes:
     get "/": resp renderPage(styles(), script())
+
     post "/deleteItem":
         # echo request
         var reqID = parseJson(request.body).getOrDefault("id").getInt()
         todoSeq = filter(todoSeq, proc(x:todoItem): bool = x.id != reqID)
         resp Http200
+
     post "/addItem":
-        var rawJSON = parseJson(request.body)
-        var todoDesc = rawJSON.getOrDefault("desc").getStr()
-        var todoDate = rawJSON.getOrDefault("date").getStr()
-        var parsedTodoDate = parse(todoDate, "YYYY-MM-dd HH:mm")
+        var 
+            rawJSON = parseJson(request.body)
+            todoDesc = rawJSON.getOrDefault("desc").getStr()
+            todoDate = rawJSON.getOrDefault("date").getStr()
+            parsedTodoDate = parse(todoDate, "YYYY-MM-dd HH:mm")
         inc highestId
         todoSeq.add addTodo(highestId, todoDesc, parsedTodoDate)
         todoSeq.sort(cmpDate)
         saveTodosToFile()
         resp Http200
+
 runForever()

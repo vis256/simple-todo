@@ -55,7 +55,6 @@ proc script(): string = tmpli js"""
         time_24hr: true
     });
 
-    console.log("Test");
 """
 
 export script
